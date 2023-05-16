@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 /*
-    Сущность Site, формерует сосответственно базу данных sites, согласно ТЗ
+    Сущность SiteConfig, формерует сосответственно базу данных sites, согласно ТЗ
  */
 @Entity
 @Table(name = "sites")

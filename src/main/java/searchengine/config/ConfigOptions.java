@@ -11,6 +11,9 @@ import java.util.List;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "indexing-settings")
-public class SitesList {
-    private List<Site> sites;
+public class ConfigOptions {
+    private String userAgent;
+    private String referrer;
+    private List<SiteConfig> sites;
+
 }
