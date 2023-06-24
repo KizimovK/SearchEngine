@@ -11,6 +11,7 @@ public interface SiteMapper {
 
 
     Site mappingToSite(SiteDto siteDto);
+    SiteDto mappingToSiteDto(Site site);
 
 
     List<Site> mappingToSiteList(List<SiteDto> siteDtoList);

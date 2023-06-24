@@ -3,5 +3,5 @@ package searchengine.services;
 import searchengine.dto.response.Response;
 
 public interface PageIndexService {
-    Response startIndexPage();
+    Response startIndexPage() throws Exception;
 }

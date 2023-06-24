@@ -1,9 +1,10 @@
 package searchengine.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import searchengine.companets.ServiceSite;
+import searchengine.companets.IndexingSite;
+import searchengine.companets.PageService;
+import searchengine.companets.SiteService;
 import searchengine.companets.extractPageOnSite.ParserPage;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
@@ -14,36 +15,52 @@ import searchengine.model.StatusIndexing;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-@RequiredArgsConstructor
+
 @Service
-public class PageIndexServiceImpl  implements PageIndexService{
-
+public class PageIndexServiceImpl implements PageIndexService {
+    @Autowired
     private ConfigOptions sitesList;
-    private ServiceSite serviceSite;
+    @Autowired
+    private SiteService siteService;
+    @Autowired
     private ConfigOptions configOptions;
+    @Autowired
     private ParserPage parserPage;
     @Autowired
-    public PageIndexServiceImpl(ConfigOptions sitesList, ServiceSite serviceSite, ConfigOptions configOptions, ParserPage parserPage) {
-        this.sitesList = sitesList;
-        this.serviceSite = serviceSite;
-        this.configOptions = configOptions;
-        this.parserPage = parserPage;
-    }
+    private PageService pageService;
+    private List<Future> futureList = new ArrayList<>();
+    private boolean isActiveIndexing = false;
 
     @Override
-    public Response startIndexPage(){
-
-        List<SiteDto> siteDTOList = getSiteFromConfig();
-        serviceSite.allSaveSites(siteDTOList);
-
-        siteDTOList.forEach(siteDto -> {
-           parserPage.startParserSite(siteDto);
+    public Response startIndexPage() throws ExecutionException, InterruptedException {
+        ExecutorService executorService;
+        List<SiteDto> siteListConfig = getSiteFromConfig();
+        siteListConfig.forEach(siteDto -> {
+            pageService.dropPagesSite(siteDto);
+            siteService.dropSite(siteDto);
         });
-        return new Response(false,"");
-    };
+        List<SiteDto> siteDtoList = new ArrayList<>();
+        for (SiteDto siteDto : siteListConfig) {
+            siteDtoList.add(siteService.saveSite(siteDto));
+        }
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        for (SiteDto siteDto : siteDtoList) {
+            futureList.add(executorService.submit(new IndexingSite(siteService, pageService, parserPage, siteDto)));
+        }
+        for (Future future : futureList) {
+            future.get();
+        }
+        isActiveIndexing = true;
+        return new Response(true, "");
+    }
 
-    private List<SiteDto> getSiteFromConfig(){
+
+    private List<SiteDto> getSiteFromConfig() {
         List<SiteDto> sitesDTOList = new ArrayList<>();
         int i = 1;
         for (SiteConfig siteConfig : sitesList.getSites()) {

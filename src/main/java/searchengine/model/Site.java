@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Site implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('INDEXING','INDEXED','FAILED')")

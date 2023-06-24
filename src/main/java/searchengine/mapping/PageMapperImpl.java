@@ -42,6 +42,7 @@ public class PageMapperImpl implements PageMapper {
 
             while(var3.hasNext()) {
                 PageDto pageDto = (PageDto)var3.next();
+
                 list.add(this.mapperToPage(pageDto));
             }
 

@@ -28,7 +28,7 @@ public class ApiController {
 
 
     @GetMapping("/startIndexing")
-    public @ResponseBody ResponseEntity<Response> startIndexing(){
+    public @ResponseBody ResponseEntity<Response> startIndexing() throws Exception {
         Response response = new Response(false,"Индексация уже запущена");
         pageIndexService.startIndexPage();
         return  new ResponseEntity<>(response, HttpStatus.OK);

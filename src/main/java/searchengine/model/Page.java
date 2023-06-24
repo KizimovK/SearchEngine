@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "pages", indexes = @Index(columnList = "path", unique = true))
+@Table(name = "pages", indexes = @Index(columnList = "path"))
 @RequiredArgsConstructor
 @Setter
 @Getter
@@ -21,7 +21,7 @@ public class Page {
     private Integer code;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "site_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "site_id", nullable = false, referencedColumnName = "id")
     private Site site;
 }

@@ -22,7 +22,7 @@ public class SiteMapperImpl implements SiteMapper {
             return null;
         } else {
             Site site = new Site();
-            //site.setId(siteDto.getId());
+            site.setId(siteDto.getId());
             site.setStatus(siteDto.getStatus());
             site.setStatusTime(siteDto.getStatusTime());
             site.setLastError(siteDto.getLastError());
@@ -30,6 +30,23 @@ public class SiteMapperImpl implements SiteMapper {
             site.setName(siteDto.getName());
             return site;
         }
+    }
+
+    @Override
+    public SiteDto mappingToSiteDto(Site site) {
+        if (site == null) {
+            return null;
+        } else {
+            SiteDto siteDto = new SiteDto();
+            siteDto.setId(site.getId());
+            siteDto.setStatus(site.getStatus());
+            siteDto.setStatusTime(site.getStatusTime());
+            siteDto.setLastError(site.getLastError());
+            siteDto.setUrl(site.getUrl());
+            siteDto.setName(site.getName());
+            return siteDto;
+        }
+
     }
 
     public List<Site> mappingToSiteList(List<SiteDto> siteDtoList) {
@@ -57,24 +74,13 @@ public class SiteMapperImpl implements SiteMapper {
 
             while(var3.hasNext()) {
                 Site site = (Site)var3.next();
-                list.add(this.siteToSiteDto(site));
+                list.add(this.mappingToSiteDto(site));
             }
 
             return list;
         }
     }
 
-    protected SiteDto siteToSiteDto(Site site) {
-        if (site == null) {
-            return null;
-        } else {
-            SiteDto siteDto = new SiteDto();
-            siteDto.setStatus(site.getStatus());
-            siteDto.setStatusTime(site.getStatusTime());
-            siteDto.setLastError(site.getLastError());
-            siteDto.setUrl(site.getUrl());
-            siteDto.setName(site.getName());
-            return siteDto;
-        }
-    }
+
+
 }
