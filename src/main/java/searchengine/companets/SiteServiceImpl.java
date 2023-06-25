@@ -47,6 +47,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public List<SiteDto> findAllSite() {
+        siteRepository.flush();
         List<SiteDto> siteDtoList = new ArrayList<>();
         siteDtoList.addAll(siteMapper.mappingToSiteDtoList((List<Site>) siteRepository.findAll()));
         return siteDtoList;

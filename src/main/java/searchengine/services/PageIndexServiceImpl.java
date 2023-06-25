@@ -1,5 +1,6 @@
 package searchengine.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import searchengine.companets.IndexingSite;
@@ -9,7 +10,6 @@ import searchengine.companets.extractPageOnSite.ParserPage;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
 import searchengine.dto.data.SiteDto;
-import searchengine.dto.response.Response;
 import searchengine.model.StatusIndexing;
 
 import java.time.LocalDateTime;
@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 
 
 @Service
+@Slf4j
 public class PageIndexServiceImpl implements PageIndexService {
     @Autowired
     private ConfigOptions sitesList;
@@ -33,12 +34,10 @@ public class PageIndexServiceImpl implements PageIndexService {
     private ParserPage parserPage;
     @Autowired
     private PageService pageService;
-    private List<Future> futureList = new ArrayList<>();
-    private boolean isActiveIndexing = false;
+    ExecutorService executorService;
 
     @Override
-    public Response startIndexPage() throws ExecutionException, InterruptedException {
-        ExecutorService executorService;
+    public void startIndexPage() throws ExecutionException, InterruptedException {
         List<SiteDto> siteListConfig = getSiteFromConfig();
         siteListConfig.forEach(siteDto -> {
             pageService.dropPagesSite(siteDto);
@@ -50,15 +49,25 @@ public class PageIndexServiceImpl implements PageIndexService {
         }
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         for (SiteDto siteDto : siteDtoList) {
-            futureList.add(executorService.submit(new IndexingSite(siteService, pageService, parserPage, siteDto)));
+            executorService.submit(new IndexingSite(siteService, pageService, parserPage, siteDto));
         }
-        for (Future future : futureList) {
-            future.get();
+//        executorService.shutdown();
+    }
+    @Override
+    public boolean isActiveIndexing() {
+        List<SiteDto> siteDtoList = siteService.findAllSite();
+        for (SiteDto siteDto : siteDtoList){
+            if (siteDto.getStatus().equals(StatusIndexing.INDEXING)){
+                return  true;
+            }
         }
-        isActiveIndexing = true;
-        return new Response(true, "");
+        return false;
     }
 
+    @Override
+    public void stopIndexPage() {
+        executorService.shutdownNow();
+    }
 
     private List<SiteDto> getSiteFromConfig() {
         List<SiteDto> sitesDTOList = new ArrayList<>();
