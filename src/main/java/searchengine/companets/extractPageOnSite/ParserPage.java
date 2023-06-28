@@ -31,7 +31,7 @@ public class ParserPage {
 
     public List<PageDto> startParserSite(SiteDto siteDto) {
         String urlSite = siteDto.getUrl();
-        String lastError = null;
+        String lastError;
         log.info("Parsing site ".concat(urlSite).concat(" ").concat(siteService.getSiteName(urlSite)));
         List<PageDto> pageDtoList = new CopyOnWriteArrayList<>();
             if (!Thread.interrupted()) {

@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 
-public class Page {
+public class PageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -23,5 +23,5 @@ public class Page {
     private String content;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "site_id", nullable = false, referencedColumnName = "id")
-    private Site site;
+    private SiteEntity siteEntity;
 }

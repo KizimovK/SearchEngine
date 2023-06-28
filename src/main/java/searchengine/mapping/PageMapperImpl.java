@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.PageDto;
-import searchengine.model.Page;
+import searchengine.model.PageEntity;
 
 @Component
 public class PageMapperImpl implements PageMapper {
@@ -20,32 +20,43 @@ public class PageMapperImpl implements PageMapper {
         this.siteMapper = siteMapper;
     }
 
-    public Page mapperToPage(PageDto pageDto) {
+    public PageEntity toPageEntity(PageDto pageDto) {
         if (pageDto == null) {
             return null;
         } else {
-            Page page = new Page();
+            PageEntity page = new PageEntity();
             page.setPath(pageDto.getPath());
             page.setCode(pageDto.getCode());
             page.setContent(pageDto.getContent());
-            page.setSite(siteMapper.mappingToSite(pageDto.getSiteDto()));
+            page.setSiteEntity(siteMapper.toSiteEntity(pageDto.getSiteDto()));
             return page;
         }
     }
 
-    public List<Page> mappingToListPage(List<PageDto> pageDtoList) {
+    @Override
+    public PageDto toPageDto(PageEntity pageEntity) {
+         if (pageEntity == null) {
+            return null;
+        } else {
+            PageDto pageDto = new PageDto();
+            pageDto.setPath(pageEntity.getPath());
+            pageDto.setCode(pageEntity.getCode());
+            pageDto.setContent(pageEntity.getContent());
+            pageDto.setSiteDto(siteMapper.toSiteDto(pageEntity.getSiteEntity()));
+            return pageDto;
+        }
+    }
+
+    public List<PageEntity> toListPageEntity(List<PageDto> pageDtoList) {
         if (pageDtoList == null) {
             return null;
         } else {
-            List<Page> list = new ArrayList(pageDtoList.size());
+            List<PageEntity> list = new ArrayList(pageDtoList.size());
             Iterator var3 = pageDtoList.iterator();
-
             while(var3.hasNext()) {
                 PageDto pageDto = (PageDto)var3.next();
-
-                list.add(this.mapperToPage(pageDto));
+                list.add(this.toPageEntity(pageDto));
             }
-
             return list;
         }
     }

@@ -1,14 +1,14 @@
 package searchengine.mapping;
 
-import org.mapstruct.Mapper;
 import searchengine.dto.data.PageDto;
-import searchengine.model.Page;
+import searchengine.model.PageEntity;
 
 import java.util.List;
 
 //@Mapper(componentModel = "spring")
 public interface PageMapper {
-    Page mapperToPage(PageDto pageDto);
+    PageEntity toPageEntity(PageDto pageDto);
+    PageDto toPageDto(PageEntity pageEntity);
 
-    List<Page> mappingToListPage(List<PageDto> pageDtoList);
+    List<PageEntity> toListPageEntity(List<PageDto> pageDtoList);
 }

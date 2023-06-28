@@ -10,7 +10,7 @@ import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
 import searchengine.dto.data.SiteDto;
 import searchengine.mapping.SiteMapper;
-import searchengine.model.Site;
+import searchengine.model.SiteEntity;
 import searchengine.model.StatusIndexing;
 import searchengine.repository.SiteRepository;
 
@@ -37,26 +37,26 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void allSaveSites(List<SiteDto> siteDtoList) {
-        siteRepository.saveAll(siteMapper.mappingToSiteList(siteDtoList));
+        siteRepository.saveAll(siteMapper.toSiteEntityList(siteDtoList));
     }
 
     @Override
     public SiteDto saveSite(SiteDto siteDto) {
-        return siteMapper.mappingToSiteDto(siteRepository.saveAndFlush(siteMapper.mappingToSite(siteDto)));
+        return siteMapper.toSiteDto(siteRepository.saveAndFlush(siteMapper.toSiteEntity(siteDto)));
     }
 
     @Override
     public List<SiteDto> findAllSite() {
         siteRepository.flush();
         List<SiteDto> siteDtoList = new ArrayList<>();
-        siteDtoList.addAll(siteMapper.mappingToSiteDtoList((List<Site>) siteRepository.findAll()));
+        siteDtoList.addAll(siteMapper.toSiteDtoList((List<SiteEntity>) siteRepository.findAll()));
         return siteDtoList;
     }
 
     @Override
     public void dropSite(SiteDto siteDto) {
         String urlSite = siteDto.getUrl();
-        List<Site> siteList = siteRepository.findAllByUrl(urlSite);
+        List<SiteEntity> siteList = siteRepository.findAllByUrl(urlSite);
         if (!siteList.isEmpty()) {
             log.info("start site date delete from ".concat(urlSite));
             siteRepository.deleteAll(siteList);
@@ -90,7 +90,7 @@ public class SiteServiceImpl implements SiteService {
         siteDto.setStatusTime(LocalDateTime.now());
         Session session = getSession();
         Transaction tx1 = session.beginTransaction();
-        session.update(siteMapper.mappingToSite(siteDto));
+        session.update(siteMapper.toSiteEntity(siteDto));
         tx1.commit();
         session.close();
     }

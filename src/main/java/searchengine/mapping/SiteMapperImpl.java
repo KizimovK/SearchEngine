@@ -10,18 +10,18 @@ import java.util.Iterator;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.SiteDto;
-import searchengine.model.Site;
+import searchengine.model.SiteEntity;
 
 @Component
 public class SiteMapperImpl implements SiteMapper {
     public SiteMapperImpl() {
     }
 
-    public Site mappingToSite(SiteDto siteDto) {
+    public SiteEntity toSiteEntity(SiteDto siteDto) {
         if (siteDto == null) {
             return null;
         } else {
-            Site site = new Site();
+            SiteEntity site = new SiteEntity();
             site.setId(siteDto.getId());
             site.setStatus(siteDto.getStatus());
             site.setStatusTime(siteDto.getStatusTime());
@@ -33,39 +33,39 @@ public class SiteMapperImpl implements SiteMapper {
     }
 
     @Override
-    public SiteDto mappingToSiteDto(Site site) {
-        if (site == null) {
+    public SiteDto toSiteDto(SiteEntity siteEntity) {
+        if (siteEntity == null) {
             return null;
         } else {
             SiteDto siteDto = new SiteDto();
-            siteDto.setId(site.getId());
-            siteDto.setStatus(site.getStatus());
-            siteDto.setStatusTime(site.getStatusTime());
-            siteDto.setLastError(site.getLastError());
-            siteDto.setUrl(site.getUrl());
-            siteDto.setName(site.getName());
+            siteDto.setId(siteEntity.getId());
+            siteDto.setStatus(siteEntity.getStatus());
+            siteDto.setStatusTime(siteEntity.getStatusTime());
+            siteDto.setLastError(siteEntity.getLastError());
+            siteDto.setUrl(siteEntity.getUrl());
+            siteDto.setName(siteEntity.getName());
             return siteDto;
         }
 
     }
 
-    public List<Site> mappingToSiteList(List<SiteDto> siteDtoList) {
+    public List<SiteEntity> toSiteEntityList(List<SiteDto> siteDtoList) {
         if (siteDtoList == null) {
             return null;
         } else {
-            List<Site> list = new ArrayList(siteDtoList.size());
+            List<SiteEntity> list = new ArrayList(siteDtoList.size());
             Iterator var3 = siteDtoList.iterator();
 
             while(var3.hasNext()) {
                 SiteDto siteDto = (SiteDto)var3.next();
-                list.add(this.mappingToSite(siteDto));
+                list.add(this.toSiteEntity(siteDto));
             }
 
             return list;
         }
     }
 
-    public List<SiteDto> mappingToSiteDtoList(List<Site> siteList) {
+    public List<SiteDto> toSiteDtoList(List<SiteEntity> siteList) {
         if (siteList == null) {
             return null;
         } else {
@@ -73,8 +73,8 @@ public class SiteMapperImpl implements SiteMapper {
             Iterator var3 = siteList.iterator();
 
             while(var3.hasNext()) {
-                Site site = (Site)var3.next();
-                list.add(this.mappingToSiteDto(site));
+                SiteEntity site = (SiteEntity)var3.next();
+                list.add(this.toSiteDto(site));
             }
 
             return list;

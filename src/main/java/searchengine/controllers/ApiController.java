@@ -25,7 +25,6 @@ public class ApiController {
     public ApiController(StatisticsService statisticsService, PageIndexService pageIndexService) {
         this.statisticsService = statisticsService;
         this.pageIndexService = pageIndexService;
-
     }
 
 

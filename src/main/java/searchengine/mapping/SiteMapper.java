@@ -1,8 +1,7 @@
 package searchengine.mapping;
 
-import org.mapstruct.Mapper;
 import searchengine.dto.data.SiteDto;
-import searchengine.model.Site;
+import searchengine.model.SiteEntity;
 
 import java.util.List;
 
@@ -10,12 +9,12 @@ import java.util.List;
 public interface SiteMapper {
 
 
-    Site mappingToSite(SiteDto siteDto);
-    SiteDto mappingToSiteDto(Site site);
+    SiteEntity toSiteEntity(SiteDto siteDto);
+    SiteDto toSiteDto(SiteEntity siteEntity);
 
 
-    List<Site> mappingToSiteList(List<SiteDto> siteDtoList);
-    List<SiteDto> mappingToSiteDtoList(List<Site> siteList);
+    List<SiteEntity> toSiteEntityList(List<SiteDto> siteDtoList);
+    List<SiteDto> toSiteDtoList(List<SiteEntity> siteList);
 
 
 }
