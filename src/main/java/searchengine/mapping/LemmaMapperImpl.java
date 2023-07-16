@@ -3,9 +3,11 @@ package searchengine.mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.LemmaDto;
+import searchengine.dto.data.SiteDto;
 import searchengine.model.LemmaEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,6 +74,40 @@ public class LemmaMapperImpl implements LemmaMapper {
                 LemmaDto lemmaDto = (LemmaDto) var3.next();
                 lemmaEntityList.add(this.toLemmaEntity(lemmaDto));
             }
+            return lemmaEntityList;
+        }
+    }
+
+    @Override
+    public List<LemmaDto> toListLemmaDto(HashMap<String, Integer> mapLemmas, SiteDto siteDto) {
+        if (mapLemmas == null) {
+            return null;
+        } else {
+            List<LemmaDto> lemmaDtoList = new ArrayList<>(mapLemmas.size());
+            mapLemmas.keySet().forEach(lemma -> {
+                LemmaDto lemmaDto = new LemmaDto();
+                lemmaDto.setLemma(lemma);
+                lemmaDto.setSiteDto(siteDto);
+                lemmaDto.setFrequency(mapLemmas.get(lemma));
+                lemmaDtoList.add(lemmaDto);
+            });
+            return lemmaDtoList;
+        }
+    }
+
+    @Override
+    public List<LemmaEntity> toListLemmaEntity(HashMap<String, Integer> mapLemmas, SiteDto siteDto) {
+        if (mapLemmas == null) {
+            return null;
+        } else {
+            List<LemmaEntity> lemmaEntityList = new ArrayList<>(mapLemmas.size());
+            mapLemmas.keySet().forEach(lemma -> {
+                LemmaEntity lemmaEntity = new LemmaEntity();
+                lemmaEntity.setLemma(lemma);
+                lemmaEntity.setSiteEntity(siteMapper.toSiteEntity(siteDto));
+                lemmaEntity.setFrequency(mapLemmas.get(lemma));
+                lemmaEntityList.add(lemmaEntity);
+            });
             return lemmaEntityList;
         }
     }

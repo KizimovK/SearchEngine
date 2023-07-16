@@ -8,6 +8,7 @@ import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -17,13 +18,16 @@ public class IndexingSite implements Runnable {
     private SiteService siteService;
     private PageService pageService;
     private ParserPage parserPage;
+    private LemmaExtractor lemmaExtractor;
     private SiteDto siteDto;
 
 
-    public IndexingSite(SiteService siteService, PageService pageService, ParserPage parserPage, SiteDto siteDto) {
+    public IndexingSite(SiteService siteService, PageService pageService,
+                        ParserPage parserPage, LemmaExtractor lemmaExtractor, SiteDto siteDto) {
         this.siteService = siteService;
         this.pageService = pageService;
         this.parserPage = parserPage;
+        this.lemmaExtractor = lemmaExtractor;
         this.siteDto = siteDto;
     }
 
@@ -34,5 +38,9 @@ public class IndexingSite implements Runnable {
         if (!siteService.getStatusIndexing(siteDto).equals(StatusIndexing.FAILED)) {
             siteService.updateStatusSite(siteDto, null, StatusIndexing.INDEXED);
         }
+        pageDtoList.forEach(pageDto -> {
+            HashMap<String, Integer> mapLemmas = lemmaExtractor.getLemmasOnPage(pageDto);
+            lemmaExtractor.saveLemmaOnPage(mapLemmas,siteDto);
+        });
     }
 }

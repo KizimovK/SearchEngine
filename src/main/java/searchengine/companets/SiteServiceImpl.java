@@ -24,11 +24,12 @@ import java.util.List;
 public class SiteServiceImpl implements SiteService {
     private final ConfigOptions configOptions;
     private final EntityManagerFactory entityManagerFactory;
-    private SiteRepository siteRepository;
-    private SiteMapper siteMapper;
+    private final SiteRepository siteRepository;
+    private final SiteMapper siteMapper;
 
     @Autowired
-    public SiteServiceImpl(SiteRepository siteRepository, SiteMapper siteMapper, ConfigOptions configOptions, SessionFactory sessionFactory, EntityManagerFactory entityManagerFactory) {
+    public SiteServiceImpl(SiteRepository siteRepository, SiteMapper siteMapper,
+                           ConfigOptions configOptions,  EntityManagerFactory entityManagerFactory) {
         this.siteRepository = siteRepository;
         this.siteMapper = siteMapper;
         this.configOptions = configOptions;

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import searchengine.companets.IndexingSite;
+import searchengine.companets.LemmaExtractor;
 import searchengine.companets.PageService;
 import searchengine.companets.SiteService;
 import searchengine.companets.extractPageOnSite.ParserPage;
@@ -34,10 +35,13 @@ public class PageIndexServiceImpl implements PageIndexService {
     private ParserPage parserPage;
     @Autowired
     private PageService pageService;
+    @Autowired
     ExecutorService executorService;
+    @Autowired
+    private LemmaExtractor lemmaExtractor;
 
     @Override
-    public void startIndexPage() throws ExecutionException, InterruptedException {
+    public void startIndexPage() {
         List<SiteDto> siteListConfig = getSiteFromConfig();
         siteListConfig.forEach(siteDto -> {
             pageService.dropPagesSite(siteDto);
@@ -47,11 +51,11 @@ public class PageIndexServiceImpl implements PageIndexService {
         for (SiteDto siteDto : siteListConfig) {
             siteDtoList.add(siteService.saveSite(siteDto));
         }
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         for (SiteDto siteDto : siteDtoList) {
-            executorService.submit(new IndexingSite(siteService, pageService, parserPage, siteDto));
+            executorService.submit(new IndexingSite(siteService, pageService, parserPage, lemmaExtractor, siteDto));
         }
-//        executorService.shutdown();
+        executorService.shutdown();
     }
     @Override
     public boolean isActiveIndexing() {
