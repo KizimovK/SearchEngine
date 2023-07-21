@@ -3,9 +3,11 @@ package searchengine.mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.IndexDto;
+import searchengine.dto.data.PageDto;
 import searchengine.model.IndexEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 

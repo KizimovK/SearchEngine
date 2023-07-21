@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+
 public class SiteServiceImpl implements SiteService {
     private final ConfigOptions configOptions;
     private final EntityManagerFactory entityManagerFactory;

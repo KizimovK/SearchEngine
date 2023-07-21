@@ -26,7 +26,6 @@ import java.util.concurrent.RecursiveTask;
 
 @RequiredArgsConstructor
 @Slf4j
-
 public class ParserPageRecursiveTask extends RecursiveTask<CopyOnWriteArrayList> {
 
 

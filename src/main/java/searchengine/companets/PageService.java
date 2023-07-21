@@ -16,7 +16,7 @@ public interface PageService {
 
     void savePage(PageDto pageDto) throws IOException;
 
-    void allSavePage(List<PageDto> pageDtoList);
+    List<PageDto> allSavePage(List<PageDto> pageDtoList);
 
     void dropPagesSite(SiteDto siteDto);
 

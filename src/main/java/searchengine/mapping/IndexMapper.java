@@ -3,6 +3,7 @@ package searchengine.mapping;
 import searchengine.dto.data.IndexDto;
 import searchengine.model.IndexEntity;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface IndexMapper {
@@ -10,4 +11,5 @@ public interface IndexMapper {
     IndexDto toIndexDto(IndexEntity indexEntity);
     List<IndexEntity> toListIndexEntity(List<IndexDto> indexDtoList);
     List<IndexDto> toListIndexDto(List<IndexEntity> indexEntityList);
+
 }

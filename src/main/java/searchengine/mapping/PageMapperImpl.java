@@ -25,6 +25,7 @@ public class PageMapperImpl implements PageMapper {
             return null;
         } else {
             PageEntity page = new PageEntity();
+            page.setId(pageDto.getId());
             page.setPath(pageDto.getPath());
             page.setCode(pageDto.getCode());
             page.setContent(pageDto.getContent());
@@ -39,6 +40,7 @@ public class PageMapperImpl implements PageMapper {
             return null;
         } else {
             PageDto pageDto = new PageDto();
+            pageDto.setId(pageEntity.getId());
             pageDto.setPath(pageEntity.getPath());
             pageDto.setCode(pageEntity.getCode());
             pageDto.setContent(pageEntity.getContent());
@@ -56,6 +58,21 @@ public class PageMapperImpl implements PageMapper {
             while(var3.hasNext()) {
                 PageDto pageDto = (PageDto)var3.next();
                 list.add(this.toPageEntity(pageDto));
+            }
+            return list;
+        }
+    }
+
+    @Override
+    public List<PageDto> toListPageDto(List<PageEntity> pageEntityList) {
+        if (pageEntityList == null) {
+            return null;
+        } else {
+            List<PageDto> list = new ArrayList(pageEntityList.size());
+            Iterator var3 = pageEntityList.iterator();
+            while(var3.hasNext()) {
+                PageEntity pageEntity = (PageEntity) var3.next();
+                list.add(this.toPageDto(pageEntity));
             }
             return list;
         }

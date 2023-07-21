@@ -2,6 +2,7 @@ package searchengine.companets.extractPageOnSite;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import searchengine.companets.PageService;
 import searchengine.companets.SiteService;
@@ -16,6 +17,7 @@ import java.util.concurrent.ForkJoinPool;
 
 @Slf4j
 @Component
+
 public class ParserPage {
     private final SiteService siteService;
     private final ConfigOptions configOptions;

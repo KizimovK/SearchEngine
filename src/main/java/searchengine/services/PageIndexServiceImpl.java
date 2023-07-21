@@ -1,10 +1,11 @@
 package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import searchengine.companets.IndexingSite;
-import searchengine.companets.LemmaExtractor;
+import searchengine.companets.LemmaIndexExtractor;
 import searchengine.companets.PageService;
 import searchengine.companets.SiteService;
 import searchengine.companets.extractPageOnSite.ParserPage;
@@ -16,31 +17,37 @@ import searchengine.model.StatusIndexing;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
 @Service
 @Slf4j
 public class PageIndexServiceImpl implements PageIndexService {
-    @Autowired
-    private ConfigOptions sitesList;
-    @Autowired
-    private SiteService siteService;
-    @Autowired
-    private ConfigOptions configOptions;
-    @Autowired
-    private ParserPage parserPage;
-    @Autowired
-    private PageService pageService;
-    @Autowired
-    ExecutorService executorService;
-    @Autowired
-    private LemmaExtractor lemmaExtractor;
+    private final ConfigOptions sitesList;
+    private final SiteService siteService;
+    private final ConfigOptions configOptions;
+    private final ParserPage parserPage;
+    private final PageService pageService;
+    private final  ExecutorService executorService;
+    private final IndexingSite indexingSite;
+    private final LemmaIndexExtractor lemmaIndexExtractor;
+
+    public PageIndexServiceImpl(ConfigOptions sitesList, SiteService siteService,
+                                ConfigOptions configOptions, ParserPage parserPage,
+                                PageService pageService, ExecutorService executorService,
+                                IndexingSite indexingSite, LemmaIndexExtractor lemmaIndexExtractor) {
+        this.sitesList = sitesList;
+        this.siteService = siteService;
+        this.configOptions = configOptions;
+        this.parserPage = parserPage;
+        this.pageService = pageService;
+        this.executorService = executorService;
+        this.indexingSite = indexingSite;
+        this.lemmaIndexExtractor = lemmaIndexExtractor;
+    }
 
     @Override
+
     public void startIndexPage() {
         List<SiteDto> siteListConfig = getSiteFromConfig();
         siteListConfig.forEach(siteDto -> {
@@ -53,7 +60,8 @@ public class PageIndexServiceImpl implements PageIndexService {
         }
 
         for (SiteDto siteDto : siteDtoList) {
-            executorService.submit(new IndexingSite(siteService, pageService, parserPage, lemmaExtractor, siteDto));
+            Runnable task = ()-> indexingSite.taskIndexingSite(siteDto);
+            executorService.submit(task);
         }
         executorService.shutdown();
     }
@@ -67,7 +75,7 @@ public class PageIndexServiceImpl implements PageIndexService {
         }
         return false;
     }
-
+    /*Todo: дописать stopIndexpage*/
     @Override
     public void stopIndexPage() {
         executorService.shutdownNow();
