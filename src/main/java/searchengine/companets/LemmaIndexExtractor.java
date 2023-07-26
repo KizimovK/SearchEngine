@@ -7,11 +7,12 @@ import searchengine.dto.data.SiteDto;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface LemmaIndexExtractor {
-    HashMap<String, Integer> getLemmas(String text);
+    Map<String, Integer> getLemmas(String text);
 
-    HashMap<String, Integer> getMapLemmasOnPage(PageDto pageDto);
+    Map<String, Integer> getMapLemmasOnPage(PageDto pageDto);
     List<LemmaDto> getLemmasOnSite(SiteDto siteDto, List<PageDto> pageDtoList);
 
     List<LemmaDto> saveLemmaOnSite(List<LemmaDto> listLemmasOnSite);

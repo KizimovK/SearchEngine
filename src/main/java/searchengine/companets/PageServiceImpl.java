@@ -48,7 +48,7 @@ public class PageServiceImpl implements PageService {
     public void dropPagesSite(SiteDto siteDto) {
         log.info("start pages delete from ".concat(siteDto.getUrl()));
         SiteEntity site = siteRepository.findByUrl(siteMapper.toSiteEntity(siteDto).getUrl());
-        pageRepository.deleteAllBySiteEntity(site);
+        pageRepository.deleteBySiteEntity(site);
     }
 
 }

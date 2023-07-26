@@ -2,17 +2,21 @@ package searchengine.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 /*
     Сущность SiteConfig, формерует сосответственно базу данных sites, согласно ТЗ
  */
 @Entity
 @Table(name = "sites")
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Setter
 @Getter
 public class SiteEntity implements Serializable {
@@ -30,5 +34,7 @@ public class SiteEntity implements Serializable {
     private String url;
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String name;
+
+
 
 }

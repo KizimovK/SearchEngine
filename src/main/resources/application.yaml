@@ -11,7 +11,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     open-in-view: true
 
@@ -29,8 +29,8 @@ indexing-settings:
       name: СалаватСтекло
     - url: https://saratovstroysteklo.com
       name: СаратовСтройСтекло
-  #  - url: https://skillbox.ru
-   #   name: Skillbox
+#    - url: https://skillbox.ru
+#      name: Skillbox
 #    - url: https://dimonvideo.ru/
 #      name: DimonVideo
 #    - url: http://radiomv.ru/

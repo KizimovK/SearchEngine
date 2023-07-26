@@ -2,7 +2,6 @@ package searchengine.companets.extractPageOnSite;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import searchengine.companets.PageService;
 import searchengine.companets.SiteService;
@@ -36,22 +35,19 @@ public class ParserPage {
         String lastError;
         log.info("Parsing site ".concat(urlSite).concat(" ").concat(siteService.getSiteName(urlSite)));
         List<PageDto> pageDtoList = new CopyOnWriteArrayList<>();
-            if (!Thread.interrupted()) {
-                CopyOnWriteArrayList<PageDto> pageForkDtoList = new CopyOnWriteArrayList<>();
-                CopyOnWriteArrayList<String> urlList = new CopyOnWriteArrayList<>();
-                ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
-                List<PageDto> pages = forkJoinPool.invoke(new ParserPageRecursiveTask(urlSite, siteDto, urlList,
-                        pageForkDtoList, configOptions, pageService, siteService));
-                pageDtoList.addAll(pages);
-            } else {
-                lastError = "Fork join exception.";
-                log.error(lastError);
-                siteService.updateStatusSite(siteDto, lastError, StatusIndexing.FAILED);
-            }
+        if (!Thread.interrupted()) {
+            CopyOnWriteArrayList<PageDto> pageForkDtoList = new CopyOnWriteArrayList<>();
+            CopyOnWriteArrayList<String> urlList = new CopyOnWriteArrayList<>();
+            ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+            List<PageDto> pages = forkJoinPool.invoke(new ParserPageRecursiveTask(urlSite, siteDto, urlList,
+                    pageForkDtoList, configOptions, pageService, siteService));
+            pageDtoList.addAll(pages);
+        } else {
+            lastError = "Fork join exception.";
+            log.error(lastError);
+            siteService.updateStatusSite(siteDto, lastError, StatusIndexing.FAILED);
+        }
 //        siteService.updateStatusSite(siteDto, "", StatusIndexing.INDEXED);
         return pageDtoList;
     }
-
-
-
 }

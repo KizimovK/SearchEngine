@@ -14,10 +14,7 @@ import searchengine.model.LemmaEntity;
 import searchengine.repository.IndexRepository;
 import searchengine.repository.LemmaRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Component
 public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
@@ -41,8 +38,8 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
 
 
     @Override
-    public HashMap<String, Integer> getLemmas(String text) {
-        HashMap<String, Integer> mapLemmas = new HashMap<>();
+    public Map<String, Integer> getLemmas(String text) {
+        TreeMap<String, Integer> mapLemmas = new TreeMap<>();
         String[] words = arrayContainsRussianWords(text);
         for (String word : words) {
             if (word.isBlank() || !isCorrectWordForm(word)) {
@@ -67,7 +64,7 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
     }
 
     @Override
-    public HashMap<String, Integer> getMapLemmasOnPage(PageDto pageDto) {
+    public Map<String, Integer> getMapLemmasOnPage(PageDto pageDto) {
         String contentOutTag = clearContent(pageDto.getContent());
         return getLemmas(contentOutTag);
     }
@@ -76,8 +73,8 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
     @Override
     public List<LemmaDto> getLemmasOnSite(SiteDto siteDto, List<PageDto> pageDtoList) {
         HashMap<String, Integer> allLemmasOnSite = new HashMap<>();
-        pageDtoList.forEach(pageDto -> {
-            HashMap<String, Integer> mapLemmas = this.getMapLemmasOnPage(pageDto);
+        pageDtoList.stream().filter(pageDto -> pageDto.getContent() != null).forEach(pageDto -> {
+            Map<String, Integer> mapLemmas = this.getMapLemmasOnPage(pageDto);
             mapLemmas.keySet().forEach(lemma -> {
                 if (allLemmasOnSite.containsKey(lemma)) {
                     allLemmasOnSite.put(lemma, allLemmasOnSite.get(lemma) + 1);
@@ -89,8 +86,8 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
         return lemmaMapper.toListLemmaDto(allLemmasOnSite, siteDto);
     }
 
-    public List<IndexDto> getIndexesOnPage(List<LemmaDto> listLemmasOnSite, PageDto pageDto){
-        HashMap<String, Integer> mapLemmasOnPage = this.getMapLemmasOnPage(pageDto);
+    public List<IndexDto> getIndexesOnPage(List<LemmaDto> listLemmasOnSite, PageDto pageDto) {
+        Map<String, Integer> mapLemmasOnPage = this.getMapLemmasOnPage(pageDto);
         List<IndexDto> listIndexOnPage = new ArrayList<>(mapLemmasOnPage.size());
         listLemmasOnSite.forEach(lemmaDto -> {
             IndexDto indexDto = new IndexDto();
@@ -108,8 +105,8 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
     @Override
     public List<IndexDto> getAllIndexesOnSite(List<PageDto> pageDtoList, List<LemmaDto> listLemmasOnSite) {
         List<IndexDto> listAllIndexOnSite = new ArrayList<>();
-        pageDtoList.forEach(pageDto ->
-                listAllIndexOnSite.addAll(this.getIndexesOnPage(listLemmasOnSite,pageDto)));
+        pageDtoList.stream().filter(pageDto -> pageDto.getContent() != null).forEach(pageDto ->
+                listAllIndexOnSite.addAll(this.getIndexesOnPage(listLemmasOnSite, pageDto)));
         return listAllIndexOnSite;
     }
 
@@ -122,7 +119,7 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
 
     @Override
     public List<IndexDto> getAndSaveIndexesOnSite(List<PageDto> pageDtoList, List<LemmaDto> listLemmasOnSite) {
-        return this.saveIndexOnSite(this.getAllIndexesOnSite(pageDtoList,listLemmasOnSite));
+        return this.saveIndexOnSite(this.getAllIndexesOnSite(pageDtoList, listLemmasOnSite));
     }
 
 
@@ -135,7 +132,7 @@ public class LemmaIndexExtractorImpl implements LemmaIndexExtractor {
 
     @Override
     public List<LemmaDto> getAndSaveLemmasOnSite(SiteDto siteDto, List<PageDto> pageDtoList) {
-        return this.saveLemmaOnSite(this.getLemmasOnSite(siteDto,pageDtoList));
+        return this.saveLemmaOnSite(this.getLemmasOnSite(siteDto, pageDtoList));
     }
 
 

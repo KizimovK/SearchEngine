@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pages", indexes = @Index(columnList = "path"))
@@ -16,7 +18,7 @@ public class PageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "path",columnDefinition = "VARCHAR(255)", nullable = false)
+    @Column(name = "path", columnDefinition = "VARCHAR(255)", nullable = false)
     private String path;
     private Integer code;
     @Column(columnDefinition = "MEDIUMTEXT")
@@ -24,4 +26,5 @@ public class PageEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "site_id", nullable = false, referencedColumnName = "id")
     private SiteEntity siteEntity;
+
 }

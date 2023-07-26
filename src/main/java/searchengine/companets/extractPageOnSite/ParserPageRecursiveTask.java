@@ -7,6 +7,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import searchengine.companets.PageService;
 import searchengine.companets.SiteService;
 import searchengine.config.ConfigOptions;
@@ -93,7 +95,8 @@ public class ParserPageRecursiveTask extends RecursiveTask<CopyOnWriteArrayList>
         pageDto.setContent(content);
         return pageDto;
     }
-    private PageDto getPageDtoHttpStatusException(HttpStatusException e){
+
+    private PageDto getPageDtoHttpStatusException(HttpStatusException e) {
         String lastError = e.getMessage();
         int code = e.getStatusCode();
         String urlPage = e.getUrl();
@@ -106,10 +109,12 @@ public class ParserPageRecursiveTask extends RecursiveTask<CopyOnWriteArrayList>
         siteService.updateStatusSite(siteDto, lastError, StatusIndexing.INDEXED);
         return pageDto;
     }
-    private void connectException(String error){
+
+    private void connectException(String error) {
         log.error(error);
         siteService.updateStatusSite(siteDto, error, StatusIndexing.FAILED);
     }
+
     private boolean checkUrlPage(String urlPage) {
         return !urlPage.contains("#")
                 && !urlPage.contains("?")

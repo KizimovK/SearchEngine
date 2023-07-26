@@ -5,7 +5,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
@@ -31,7 +30,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Autowired
     public SiteServiceImpl(SiteRepository siteRepository, SiteMapper siteMapper,
-                           ConfigOptions configOptions,  EntityManagerFactory entityManagerFactory) {
+                           ConfigOptions configOptions, EntityManagerFactory entityManagerFactory) {
         this.siteRepository = siteRepository;
         this.siteMapper = siteMapper;
         this.configOptions = configOptions;
@@ -59,12 +58,11 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public void dropSite(SiteDto siteDto) {
         String urlSite = siteDto.getUrl();
-        List<SiteEntity> siteList = siteRepository.findAllByUrl(urlSite);
-        if (!siteList.isEmpty()) {
-            log.info("start site date delete from ".concat(urlSite));
-            siteRepository.deleteAll(siteList);
-        }
+        log.info("start site date delete from ".concat(urlSite));
+        siteRepository.delete(siteMapper.toSiteEntity(siteDto));
     }
+
+
 
     @Override
     public String getSiteName(String urlSite) {
