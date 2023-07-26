@@ -14,5 +14,5 @@ import java.util.List;
 
 public interface IndexingSite {
    void taskIndexingSite(SiteDto siteDto);
-
+   void taskIndexingOnePage(String urlPage);
 }
