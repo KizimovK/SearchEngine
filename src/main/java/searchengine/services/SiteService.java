@@ -1,4 +1,4 @@
-package searchengine.companets;
+package searchengine.services;
 
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;
@@ -22,4 +22,5 @@ public interface SiteService {
 
     void updateStatusTime(SiteDto siteDto);
     StatusIndexing getStatusIndexing(SiteDto siteDto);
+    SiteDto findSite(String urlSite);
 }

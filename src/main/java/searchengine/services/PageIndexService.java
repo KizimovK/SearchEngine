@@ -1,7 +1,9 @@
 package searchengine.services;
 
 public interface PageIndexService {
-    void startIndexPage() throws Exception;
+    void startIndexedPagesAllSite() throws Exception;
     boolean isActiveIndexing();
-    void stopIndexPage();
+    void stopIndexedPagesAllSite();
+    boolean isPresentUrlPage(String urlPage);
+    void indexOnePage(String urlPage);
 }

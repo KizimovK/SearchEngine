@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class LemmaDto {
-    private Long id;
+    private int id;
     private SiteDto siteDto;
     private String lemma;
-    private Integer frequency;
+    private int frequency;
 }

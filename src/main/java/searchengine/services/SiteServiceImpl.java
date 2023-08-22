@@ -1,10 +1,9 @@
-package searchengine.companets;
+package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
@@ -28,7 +27,7 @@ public class SiteServiceImpl implements SiteService {
     private final SiteRepository siteRepository;
     private final SiteMapper siteMapper;
 
-    @Autowired
+
     public SiteServiceImpl(SiteRepository siteRepository, SiteMapper siteMapper,
                            ConfigOptions configOptions, EntityManagerFactory entityManagerFactory) {
         this.siteRepository = siteRepository;
@@ -39,6 +38,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void allSaveSites(List<SiteDto> siteDtoList) {
+        siteRepository.flush();
         siteRepository.saveAll(siteMapper.toSiteEntityList(siteDtoList));
     }
 
@@ -80,6 +80,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void updateStatusSite(SiteDto siteDto, String lastError, StatusIndexing statusIndexing) {
+        siteRepository.flush();
         siteDto.setStatus(statusIndexing);
         siteDto.setLastError(lastError);
         siteDto.setStatusTime(LocalDateTime.now());
@@ -88,6 +89,7 @@ public class SiteServiceImpl implements SiteService {
 
     @Override
     public void updateStatusTime(SiteDto siteDto) {
+        siteRepository.flush();
         siteDto.setStatusTime(LocalDateTime.now());
         Session session = getSession();
         Transaction tx1 = session.beginTransaction();
@@ -99,6 +101,11 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public StatusIndexing getStatusIndexing(SiteDto siteDto) {
         return siteRepository.findById(siteDto.getId()).get().getStatus();
+    }
+
+    @Override
+    public SiteDto findSite(String urlSite) {
+        return siteMapper.toSiteDto(siteRepository.findByUrl(urlSite));
     }
 
     private Session getSession() {

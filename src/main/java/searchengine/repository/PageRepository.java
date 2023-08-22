@@ -12,9 +12,12 @@ import java.util.List;
 public interface PageRepository extends JpaRepository<PageEntity, Integer> {
     @Transactional
     void deleteAllBySiteEntity(SiteEntity siteEntity);
-
     @Transactional
     void deleteBySiteEntity(SiteEntity site);
     @Transactional
     List<PageEntity> findAllBySiteEntity(SiteEntity site);
+    @Transactional
+    PageEntity findByPathAndSiteEntity(String path, SiteEntity siteEntity);
+    @Transactional
+    int countBySiteEntity(SiteEntity siteEntity);
 }

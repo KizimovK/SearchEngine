@@ -2,17 +2,21 @@ package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import searchengine.companets.*;
+import searchengine.companets.AsyncIndexingSite;
+import searchengine.companets.CleanerOfDataSite;
+import searchengine.companets.extractPageOnSite.ParserPageTask;
+import searchengine.companets.extractPageOnSite.ParserSite;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -20,38 +24,29 @@ import java.util.concurrent.TimeUnit;
 public class PageIndexServiceImpl implements PageIndexService {
     private final ConfigOptions sitesList;
     private final SiteService siteService;
-    private final ConfigOptions configOptions;
-    private final PageService pageService;
-    private final ExecutorService executorService;
-    private final IndexingSite indexingSite;
-    private final LemmaIndexExtractor lemmaIndexExtractor;
-    private final CleanerOfDataSte cleanerSchemasSite;
-
+    private final AsyncIndexingSite asyncIndexingSite;
+    private final ParserSite parserSite;
+    private final CleanerOfDataSite cleanerOfDataSite;
+    private List<CompletableFuture<?>> futureList = new ArrayList<>();
 
     public PageIndexServiceImpl(ConfigOptions sitesList, SiteService siteService,
-                                ConfigOptions configOptions,
-                                PageService pageService, ExecutorService executorService,
-                                IndexingSite indexingSite, LemmaIndexExtractor lemmaIndexExtractor, CleanerOfDataSte cleanerSchemasSite) {
+                                AsyncIndexingSite asyncIndexingSite, ParserSite parserSite,
+                                CleanerOfDataSite cleanerOfDataSite) {
+
         this.sitesList = sitesList;
         this.siteService = siteService;
-        this.configOptions = configOptions;
-        this.pageService = pageService;
-        this.executorService = executorService;
-        this.indexingSite = indexingSite;
-        this.lemmaIndexExtractor = lemmaIndexExtractor;
-        this.cleanerSchemasSite = cleanerSchemasSite;
+        this.asyncIndexingSite = asyncIndexingSite;
+        this.parserSite = parserSite;
+        this.cleanerOfDataSite = cleanerOfDataSite;
     }
 
     @Override
-
-    public void startIndexPage() {
-        List<SiteDto> siteListConfig = getSiteFromConfig();
+    public void startIndexedPagesAllSite() {
+        List<SiteDto> siteListConfig = getListSitesFromConfig();
+        ParserPageTask.begin();
         for (SiteDto siteDto : siteListConfig) {
-            Runnable task = () -> indexingSite.taskIndexingSite(siteDto);
-            executorService.submit(task);
+            asyncIndexingSite.taskIndexingSite(siteDto);
         }
-
-
     }
 
     @Override
@@ -65,31 +60,77 @@ public class PageIndexServiceImpl implements PageIndexService {
         return false;
     }
 
-    /*Todo: дописать stopIndexpage*/
     @Override
-    public void stopIndexPage() {
+    public void stopIndexedPagesAllSite() {
         log.info("Stop indexing");
-        executorService.shutdownNow(); // initiate shutdown
-        List<SiteDto> siteDtoList = siteService.findAllSite();
-        siteDtoList.forEach(siteDto ->
-                siteService.updateStatusSite(siteDto, "Stop Indexing", StatusIndexing.FAILED));
+        ParserPageTask.stop();
     }
 
-    private List<SiteDto> getSiteFromConfig() {
+    @Override
+    public boolean isPresentUrlPage(String urlPage) {
+        var urlSite = getBaseUrlSite(urlPage);
+        for (SiteConfig siteConfig : sitesList.getSites()) {
+            if (siteConfig.getUrl().endsWith(urlSite)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Во первых расмотрим такое условие, если индексация, ни когда не запускалась,
+    то данные об этом сайте надо отобразить в таблице sites,  и смело индексировать данную страницу.
+    Если индексация данного сайта  уже производилась, то проверяем на наличее данной страницы в
+    таблице pages.
+    Если запись есть, то удаляем данные из таблиц pages и index_lemma. Затем только индексируем.
+     */
+    @Override
+    public void indexOnePage(String urlPage) {
+        String urlSite = getBaseUrlSite(urlPage);
+        SiteConfig siteConfig =
+                sitesList.getSites().stream().filter(s -> s.getUrl().endsWith(urlSite)).findFirst().get();
+
+        SiteDto siteDto = siteService.findSite(siteConfig.getUrl());
+        if (siteDto == null) {
+            siteDto = siteService.saveSite(getSiteFromConfig(siteConfig));
+        } else {
+            cleanerOfDataSite.removeOnePage(urlPage,siteDto);
+        }
+        parserSite.startParserOnePage(urlPage,siteDto);
+    }
+
+    private List<SiteDto> getListSitesFromConfig() {
         List<SiteDto> sitesDTOList = new ArrayList<>();
         int i = 1;
         for (SiteConfig siteConfig : sitesList.getSites()) {
-            SiteDto siteDTO = new SiteDto();
+            SiteDto siteDTO = getSiteFromConfig(siteConfig);
             siteDTO.setId(i);
-            siteDTO.setUrl(siteConfig.getUrl());
-            siteDTO.setName(siteConfig.getName());
-            siteDTO.setStatus(StatusIndexing.INDEXING);
-            siteDTO.setStatusTime(LocalDateTime.now());
-            siteDTO.setLastError(null);
             sitesDTOList.add(siteDTO);
             i++;
         }
         return sitesDTOList;
+    }
+
+    private SiteDto getSiteFromConfig(SiteConfig siteConfig) {
+        SiteDto siteDTO = new SiteDto();
+        siteDTO.setUrl(siteConfig.getUrl());
+        siteDTO.setName(siteConfig.getName());
+        siteDTO.setStatus(StatusIndexing.INDEXING);
+        siteDTO.setStatusTime(LocalDateTime.now());
+        siteDTO.setLastError(null);
+        return siteDTO;
+    }
+
+    private String getBaseUrlSite(String urlPage) {
+        if (urlPage.isEmpty()) {
+            return "";
+        }
+        URL url = null;
+        try {
+            url = new URL(urlPage);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return url.getHost();
     }
 
 }

@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import searchengine.dto.response.Response;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.PageIndexService;
@@ -37,7 +34,7 @@ public class ApiController {
         } else {
             response = new Response(true, "");
             log.info("Begin indexing");
-            pageIndexService.startIndexPage();
+            pageIndexService.startIndexedPagesAllSite();
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -48,12 +45,27 @@ public class ApiController {
         if (pageIndexService.isActiveIndexing()) {
             log.info("Stop indexing");
             response = new Response(true, "");
-            pageIndexService.stopIndexPage();
+            pageIndexService.stopIndexedPagesAllSite();
         } else {
             log.info("Indexing is not running");
             response = new Response(false, "Индексация не запущена");
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/indexPage")
+    public ResponseEntity<Response> indexOnePage(@RequestParam(name = "url") String urlPage){
+        Response response;
+        if  (urlPage.isEmpty()){
+            response = new Response(false, "Страница не указана");
+            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        }
+        if (!pageIndexService.isPresentUrlPage(urlPage)) {
+            response = new Response(false, "Указанная страница за пределами конфигурационного файла");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        pageIndexService.indexOnePage(urlPage);
+        response = new Response(true,"");
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     @GetMapping("/statistics")

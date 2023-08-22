@@ -1,8 +1,7 @@
-package searchengine.companets;
+package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
@@ -34,8 +33,8 @@ public class PageServiceImpl implements PageService {
         this.siteMapper = siteMapper;
     }
 
-    public void savePage(PageDto pageDto) throws IOException {
-        pageRepository.save(pageMapper.toPageEntity(pageDto));
+    public PageDto savePage(PageDto pageDto) throws IOException {
+        return pageMapper.toPageDto(pageRepository.save(pageMapper.toPageEntity(pageDto)));
     }
 
     public List<PageDto> allSavePage(List<PageDto> pageDtoList) {
