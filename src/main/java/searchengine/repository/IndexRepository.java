@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.IndexEntity;
+import searchengine.model.LemmaEntity;
 import searchengine.model.PageEntity;
 
 import java.util.List;
@@ -22,4 +23,11 @@ public interface IndexRepository extends JpaRepository<IndexEntity, Integer> {
     int insertIndex(@Param("page_id") int idPage, @Param("lemma_id") int idLemma, @Param("rank_index") float rank);
     @Transactional
     List<IndexEntity> findAllByPageEntity(PageEntity pageEntity);
+    @Transactional
+    @Query(value = "SELECT i FROM IndexEntity i WHERE i.lemmaEntity IN :lemmaEntityList AND i.pageEntity IN :pageEntityList")
+    List<IndexEntity> findLemmasAndPages(List<LemmaEntity> lemmaEntityList,List<PageEntity> pageEntityList);
+    @Transactional
+    @Query(value = "SELECT i FROM IndexEntity i WHERE i.pageEntity = :pageEntity AND i.lemmaEntity IN :lemmaEntityList")
+    List<IndexEntity> findIndexByPageAndLemmasList(PageEntity pageEntity, List<LemmaEntity> lemmaEntityList);
+
 }

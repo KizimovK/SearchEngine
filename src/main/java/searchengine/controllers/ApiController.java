@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import searchengine.dto.response.Response;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.PageIndexService;
+import searchengine.services.SearchService;
 import searchengine.services.StatisticsService;
 
 @RestController
@@ -17,11 +18,14 @@ public class ApiController {
 
     private final StatisticsService statisticsService;
     private final PageIndexService pageIndexService;
+    private final SearchService searchService;
 
     @Autowired
-    public ApiController(StatisticsService statisticsService, PageIndexService pageIndexService) {
+    public ApiController(StatisticsService statisticsService, PageIndexService pageIndexService,
+                         SearchService searchService) {
         this.statisticsService = statisticsService;
         this.pageIndexService = pageIndexService;
+        this.searchService = searchService;
     }
 
 
@@ -71,5 +75,17 @@ public class ApiController {
     @GetMapping("/statistics")
     public ResponseEntity<StatisticsResponse> statistics() {
         return ResponseEntity.ok(statisticsService.getStatistics());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
+                                                 @RequestParam(name = "site", required = false, defaultValue = "") String site,
+                                                 @RequestParam(name = "offset", required = false, defaultValue = "0") int offset){
+        if (query.isEmpty()){
+            Response response = new Response(false, "Задан пустой поисковой запрос");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        searchService.getResponseSearchQuery(query,site,offset,30);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

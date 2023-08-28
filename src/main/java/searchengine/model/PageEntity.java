@@ -23,7 +23,7 @@ public class PageEntity {
     private Integer code;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "site_id", nullable = false, referencedColumnName = "id")
     private SiteEntity siteEntity;
 

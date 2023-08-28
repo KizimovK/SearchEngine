@@ -2,6 +2,7 @@ package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import searchengine.companets.ExtractLemma;
 import searchengine.dto.data.SiteDto;
 import searchengine.mapping.IndexMapper;
@@ -16,7 +17,7 @@ import searchengine.repository.SiteRepository;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-@Component
+@Service
 @Slf4j
 public class LemmaIndexServiceImpl implements LemmaIndexService {
 
@@ -67,11 +68,9 @@ public class LemmaIndexServiceImpl implements LemmaIndexService {
     }
 
     @Override
-
     public List<LemmaEntity> findAllLemmas(SiteDto siteDto) {
         lemmaRepository.flush();
         List<LemmaEntity> lemmaEntityList = lemmaRepository.findAllBySiteEntity(siteMapper.toSiteEntity(siteDto));
-
         return lemmaEntityList;
     }
 

@@ -16,10 +16,10 @@ public class IndexEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "page_id", referencedColumnName = "id", nullable = false)
     private PageEntity pageEntity;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "lemma_id", referencedColumnName = "id", nullable = false)
     private LemmaEntity lemmaEntity;
     @Column(nullable = false, name = "rank_index")

@@ -52,6 +52,7 @@ public class ParserSite {
     public void startParserOnePage(String urlPage, SiteDto siteDto){
         ParserPageTask parserPageTask = new ParserPageTask(configOptions, pageService,
                 siteService,makerIndex);
+        log.info("Parsing one webpage: " + urlPage);
         parserPageTask.parserPageOneTask(urlPage, siteDto);
     }
 }

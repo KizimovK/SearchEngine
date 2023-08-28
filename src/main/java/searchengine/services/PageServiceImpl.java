@@ -3,6 +3,7 @@ package searchengine.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
 import searchengine.mapping.PageMapper;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Slf4j
-@Component
+@Service
 
 public class PageServiceImpl implements PageService {
     private final SiteRepository siteRepository;

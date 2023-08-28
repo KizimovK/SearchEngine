@@ -5,6 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
 import searchengine.dto.data.SiteDto;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Component
+@Service
 
 public class SiteServiceImpl implements SiteService {
     private final ConfigOptions configOptions;

@@ -15,12 +15,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Setter
 @Getter
-@Lazy
+
 public class LemmaEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "site_id", referencedColumnName = "id", nullable = false)
     private SiteEntity siteEntity;
     @Column(nullable = false)

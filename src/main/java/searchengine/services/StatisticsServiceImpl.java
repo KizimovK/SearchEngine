@@ -2,7 +2,6 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import searchengine.config.SiteConfig;
 import searchengine.config.ConfigOptions;
 import searchengine.dto.statistics.DetailedStatisticsItem;
 import searchengine.dto.statistics.StatisticsData;
@@ -14,9 +13,8 @@ import searchengine.repository.LemmaRepository;
 import searchengine.repository.PageRepository;
 import searchengine.repository.SiteRepository;
 
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
-import java.util.ArrayList;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -25,8 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService {
 
-    private final Random random = new Random();
-    private final ConfigOptions sites;
     private final PageRepository pageRepository;
     private final SiteRepository siteRepository;
     private final LemmaRepository lemmaRepository;
@@ -68,8 +64,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         item.setUrl(siteEntity.getUrl());
         item.setStatus(siteEntity.getStatus().toString());
         item.setError(siteEntity.getLastError());
-        //TODO:  Get time status
-        long statusTime = siteEntity.getStatusTime().toEpochSecond(ZoneOffset.UTC);
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(siteEntity.getStatusTime(),ZoneId.systemDefault());
+        long statusTime = zonedDateTime.toInstant().toEpochMilli();
         item.setStatusTime(statusTime);
         item.setPages(pageRepository.countBySiteEntity(siteEntity));
         item.setLemmas(lemmaRepository.countBySiteEntity(siteEntity));
