@@ -57,26 +57,12 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void dropSite(SiteDto siteDto) {
-        String urlSite = siteDto.getUrl();
-        log.info("start site date delete from ".concat(urlSite));
-        siteRepository.delete(siteMapper.toSiteEntity(siteDto));
-    }
-
-
-
-    @Override
     public String getSiteName(String urlSite) {
         return configOptions.getSites().stream()
                 .filter(site -> site.getUrl().equals(urlSite))
                 .findFirst()
                 .map(SiteConfig::getName)
                 .orElse("");
-    }
-
-    @Override
-    public int getSiteId(String urlSite) {
-        return siteRepository.findByUrl(urlSite).getId();
     }
 
     @Override

@@ -27,8 +27,4 @@ public interface PageRepository extends JpaRepository<PageEntity, Integer> {
     @Query(value = "SELECT p FROM PageEntity p " +
             "JOIN IndexEntity i ON p = i.pageEntity WHERE i.lemmaEntity IN :lemmaEntityList")
     List<PageEntity> findPagesByLemmas(@Param("lemmaEntityList")List<LemmaEntity> lemmaEntityList);
-    @Transactional
-    @Query(value = "SELECT p FROM PageEntity p " +
-            "JOIN IndexEntity i ON p = i.pageEntity WHERE i.lemmaEntity = :lemmaEntity")
-    List<PageEntity> findPagesByLemma(@Param("lemmaEntity")LemmaEntity lemmaEntity);
 }

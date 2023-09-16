@@ -175,7 +175,8 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
         pageDto.setCode(code);
         pageDto.setContent(null);
         log.error(lastError);
-        siteService.updateStatusSite(siteDto, lastError, StatusIndexing.INDEXED);
+        siteService.updateStatusTime(siteDto);
+//        siteService.updateStatusSite(siteDto, lastError, StatusIndexing.INDEXED);
         return pageDto;
     }
 

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.response.Response;
+import searchengine.dto.searchs.SearchResponse;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.PageIndexService;
 import searchengine.services.SearchService;
@@ -56,20 +57,21 @@ public class ApiController {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @PostMapping("/indexPage")
-    public ResponseEntity<Response> indexOnePage(@RequestParam(name = "url") String urlPage){
+    public ResponseEntity<Response> indexOnePage(@RequestParam(name = "url") String urlPage) {
         Response response;
-        if  (urlPage.isEmpty()){
+        if (urlPage.isEmpty()) {
             response = new Response(false, "Страница не указана");
-            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         if (!pageIndexService.isPresentUrlPage(urlPage)) {
             response = new Response(false, "Указанная страница за пределами конфигурационного файла");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         pageIndexService.indexOnePage(urlPage);
-        response = new Response(true,"");
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        response = new Response(true, "");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/statistics")
@@ -79,13 +81,23 @@ public class ApiController {
 
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-                                                 @RequestParam(name = "site", required = false, defaultValue = "") String site,
-                                                 @RequestParam(name = "offset", required = false, defaultValue = "0") int offset){
-        if (query.isEmpty()){
+                                    @RequestParam(name = "site", required = false, defaultValue = "") String site,
+                                    @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+                                    @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+        if (query.isEmpty()) {
             Response response = new Response(false, "Задан пустой поисковой запрос");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        searchService.getResponseSearchQuery(query,site,offset,30);
-        return new ResponseEntity<>(HttpStatus.OK);
+        SearchResponse searchResponse;
+        if (site.isEmpty()) {
+            searchResponse = searchService.getResponseSearch(query, "", offset, limit);
+        } else {
+            searchResponse = searchService.getResponseSearch(query, site, offset, limit);
+        }
+        if (!searchResponse.isResult()){
+            Response response = new Response(false, "Не найдено");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(searchResponse, HttpStatus.OK);
     }
 }

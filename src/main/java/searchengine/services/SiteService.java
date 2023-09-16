@@ -13,10 +13,7 @@ public interface SiteService {
 
     List<SiteDto> findAllSite();
 
-    void dropSite(SiteDto siteDto);
-
     String getSiteName(String urlSite);
-    int getSiteId(String urlSite);
 
     void updateStatusSite(SiteDto siteDto, String lastError, StatusIndexing statusIndexing);
 

@@ -27,8 +27,8 @@ indexing-settings:
   sites:
     - url: http://www.salstek.ru
       name: СалаватСтекло
-    - url: https://saratovstroysteklo.com
-      name: СаратовСтройСтекло
+#    - url: https://saratovstroysteklo.com
+#      name: СаратовСтройСтекло
 #    - url: https://skillbox.ru
 #      name: Skillbox
 #    - url: https://dimonvideo.ru/

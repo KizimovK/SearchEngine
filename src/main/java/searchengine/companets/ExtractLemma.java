@@ -10,7 +10,7 @@ import java.util.*;
 @Component
 public class ExtractLemma {
     private static final String WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
-    private static final String[] particlesNames = new String[]{"МЕЖД", "ПРЕДЛ", "СОЮЗ"};
+    private static final String[] particlesNames = new String[]{"ПРЕДЛ",  "СОЮЗ", "МЕЖД", "ЧАСТ"};
     private final LuceneMorphology luceneMorphology;
 
     public ExtractLemma(LuceneMorphology luceneMorphology) {
@@ -74,7 +74,7 @@ public class ExtractLemma {
         return false;
     }
 
-    private String[] arrayContainsRussianWords(String text) {
+    public String[] arrayContainsRussianWords(String text) {
         return text.toLowerCase(Locale.ROOT)
                 .replaceAll("([^а-я\\s])", " ")
                 .trim()

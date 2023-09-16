@@ -2,6 +2,7 @@ package searchengine.companets;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
@@ -27,7 +28,7 @@ public class MakerIndex {
         this.siteMapper = siteMapper;
     }
 
-    //    @Async
+
     public void taskCreateIndexLemmas(PageDto pageDto, ConcurrentHashMap<String, Integer> lemmasMapOnSite) {
         if (pageDto.getContent().isBlank()) {
             return;
