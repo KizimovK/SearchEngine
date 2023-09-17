@@ -34,7 +34,7 @@ public class ParserSite {
 
 
     public void startParserSite(SiteDto siteDto) {
-        String urlSite = siteDto.getUrl();
+        String urlSite = siteDto.getUrl().concat("/");
         String lastError;
         log.info("Parsing site ".concat(urlSite).concat(" ").concat(siteService.getSiteName(urlSite)));
         if (!Thread.interrupted()) {

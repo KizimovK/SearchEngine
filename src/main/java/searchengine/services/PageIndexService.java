@@ -6,4 +6,5 @@ public interface PageIndexService {
     void stopIndexedPagesAllSite();
     boolean isPresentUrlPage(String urlPage);
     void indexOnePage(String urlPage);
+    boolean isValidUrl(String urlPage);
 }

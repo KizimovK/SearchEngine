@@ -93,9 +93,22 @@ public class PageIndexServiceImpl implements PageIndexService {
         if (siteDto == null) {
             siteDto = siteService.saveSite(getSiteFromConfig(siteConfig));
         } else {
-            cleanerOfDataSite.removeOnePage(urlPage,siteDto);
+            cleanerOfDataSite.removeOnePage(urlPage, siteDto);
         }
-        parserSite.startParserOnePage(urlPage,siteDto);
+        parserSite.startParserOnePage(urlPage, siteDto);
+    }
+
+    @Override
+    public boolean isValidUrl(String urlPage) {
+        if (urlPage.matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+            try {
+                new URL(urlPage);
+            } catch (MalformedURLException e) {
+               return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     private List<SiteDto> getListSitesFromConfig() {

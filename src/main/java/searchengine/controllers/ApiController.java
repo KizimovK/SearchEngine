@@ -65,13 +65,18 @@ public class ApiController {
             response = new Response(false, "Страница не указана");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+        if (!pageIndexService.isValidUrl(urlPage)){
+            response = new Response(false, "Неверный формат адресса запрашиваемой страницы");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         if (!pageIndexService.isPresentUrlPage(urlPage)) {
             response = new Response(false, "Указанная страница за пределами конфигурационного файла");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else {
+            pageIndexService.indexOnePage(urlPage);
+            response = new Response(true, "");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        pageIndexService.indexOnePage(urlPage);
-        response = new Response(true, "");
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/statistics")
@@ -94,7 +99,7 @@ public class ApiController {
         } else {
             searchResponse = searchService.getResponseSearch(query, site, offset, limit);
         }
-        if (!searchResponse.isResult()){
+        if (!searchResponse.isResult()) {
             Response response = new Response(false, "Не найдено");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

@@ -79,7 +79,7 @@ public class SearchServiceImpl implements SearchService {
             searchDto.setSiteName(page.getSiteEntity().getName());
             searchDto.setUri(page.getPath());
             searchDto.setTitle(getTitlePage(page));
-            searchDto.setSnippet(getSnippetText(page.getContent(), lemmasQueryList, page.getPath()));
+            searchDto.setSnippet(getSnippetText(page.getContent(), lemmasQueryList));
             searchDto.setRelevance(pageRelevanceMap.get(page));
             searchDataList.add(searchDto);
         }
@@ -126,21 +126,29 @@ public class SearchServiceImpl implements SearchService {
         return pageRelevanceMap;
     }
 
-    private String getSnippetText(String content, List<String> lemmasQueryList, String path) {
+    private String getSnippetText(String content, List<String> lemmasQueryList) {
         Document document = Jsoup.parse(content);
         String bodyContent = document.body().text();
-        Map<String, Integer> positionsMap = getPositionsMap(bodyContent, lemmasQueryList);
+        TreeSet<Integer> positionsSet = new TreeSet<>(getPositionsMap(bodyContent, lemmasQueryList).values());
         List<String> wordBoltList = new ArrayList<>();
-        String resultSnippet = "";
-        for (int position : positionsMap.values()) {
+        StringBuilder resultSnippet = new StringBuilder();
+        int lastEndPosition = 0;
+        for (int position : positionsSet) {
             int beginPosition = bodyContent.indexOf(" ", position - 75 < 0 ? 0 : position - 75);
             int endPosition = bodyContent.lastIndexOf(" ", position + 75 > bodyContent.length() ?
                     bodyContent.length() : position + 75);
+            if (beginPosition - lastEndPosition > 150 && lastEndPosition != 0) {
+                resultSnippet.append("...");
+            }
+            if (beginPosition < lastEndPosition && lastEndPosition != 0) {
+                resultSnippet.append(bodyContent.substring(lastEndPosition, endPosition));
+            } else {
+                resultSnippet.append(bodyContent.substring(beginPosition, endPosition));
+            }
+            lastEndPosition = endPosition;
             wordBoltList.add(bodyContent.substring(position, bodyContent.indexOf(" ", position)));
-            String currentResult = bodyContent.substring(beginPosition, endPosition);
-            resultSnippet = joinTwoString(resultSnippet, currentResult);
         }
-        return setBoltWords(resultSnippet, wordBoltList);
+        return setBoltWords(resultSnippet.toString(), wordBoltList);
     }
 
     private String setBoltWords(String text, List<String> wordBoltList) {
@@ -150,15 +158,15 @@ public class SearchServiceImpl implements SearchService {
         return text;
     }
 
-    private String joinTwoString(String one, String two) {
-        Set<String> resultSet = new LinkedHashSet<>(List.of(one.split("\\s+")));
-        resultSet.addAll(List.of(two.split("\\s+")));
-        StringBuilder result = new StringBuilder();
-        for (String s : resultSet) {
-            result.append(s).append(" ");
-        }
-        return result.toString();
-    }
+//    private String joinTwoString(String one, String two) {
+//        Set<String> resultSet = new LinkedHashSet<>(List.of(one.split("\\s+")));
+//        resultSet.addAll(List.of(two.split("\\s+")));
+//        StringBuilder result = new StringBuilder();
+//        for (String s : resultSet) {
+//            result.append(s).append(" ");
+//        }
+//        return result.toString();
+//    }
 
     //Получение позиций ближайших лемм в контенте
     private Map<String, Integer> getPositionsMap(String bodyContent, List<String> lemmasQueryList) {

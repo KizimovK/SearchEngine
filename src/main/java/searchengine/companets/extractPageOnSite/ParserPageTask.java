@@ -7,12 +7,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import searchengine.companets.MakerIndex;
-import searchengine.services.PageService;
-import searchengine.services.SiteService;
 import searchengine.config.ConfigOptions;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;
+import searchengine.services.PageService;
+import searchengine.services.SiteService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -32,7 +32,7 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
 
     private static volatile boolean canceled = false;
     private final String urlSite;
-    private final SiteDto siteDto;
+    private SiteDto siteDto;
     private final CopyOnWriteArraySet<String> allPagesSite;
 
     private final ConfigOptions configOptions;
@@ -90,21 +90,17 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
             siteService.updateStatusTime(siteDto);
             ParserPageTask task;
             for (Element element : elements) {
+                if (canceled) {
+                    throw new StopIndexingException();
+                }
                 urlPage = element.absUrl("href");
-                if (checkUrlPage(urlPage) &&
-                        !urlPage.isEmpty() &&
-                        urlPage.startsWith(element.baseUri()) &&
-                        !allPagesSite.contains(urlPage) &&
-                        !urlPage.contains("#")
-                ) {
-                    if (canceled) {
-                        throw new StopIndexingException();
-                    }
+                if (checkUrlPage(urlPage) && !urlPage.isEmpty() &&
+                        urlPage.startsWith(element.baseUri()) && !allPagesSite.contains(urlPage) &&
+                        !urlPage.contains("#")) {
                     allPagesSite.add(urlPage);
                     log.info("PARSING PAGE " + urlPage);
                     PageDto pageDto = pageService.savePage(getPageDtoUrl(urlPage, siteDto));
                     makerIndex.taskCreateIndexLemmas(pageDto, lemmasMapOnSite);
-                    sleep(150);
                     task = new ParserPageTask(urlPage, siteDto, allPagesSite,
                             configOptions, pageService, siteService, makerIndex, lemmasMapOnSite);
                     task.fork();
@@ -134,8 +130,12 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
             setException(e.getMessage());
         }
     }
-
+    private void setSiteDto(SiteDto siteDto)
+    {
+        this.siteDto = siteDto;
+    }
     public void parserPageOneTask(String urlPage, SiteDto siteDto) {
+        setSiteDto(siteDto);
         try {
             ConcurrentHashMap<String, Integer> lemmasMap = makerIndex.getMapLemmas(siteDto);
             PageDto pageDto = pageService.savePage(getPageDtoUrl(urlPage, siteDto));

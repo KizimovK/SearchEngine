@@ -59,12 +59,16 @@ public class CleanerOfDataSite {
             });
         }
     }
-    public void removeOnePage(String urlPage, SiteDto siteDto){
+
+    public void removeOnePage(String urlPage, SiteDto siteDto) {
         PageEntity pageEntity =
-                pageRepository.findByPathAndSiteEntity(getPathPage(urlPage),siteMapper.toSiteEntity(siteDto));
-        indexRepository.deleteAllByPageEntity(pageEntity);
-        pageRepository.delete(pageEntity);
+                pageRepository.findByPathAndSiteEntity(getPathPage(urlPage), siteMapper.toSiteEntity(siteDto));
+        if (pageEntity != null) {
+            indexRepository.deleteAllByPageEntity(pageEntity);
+            pageRepository.delete(pageEntity);
+        }
     }
+
     private String getPathPage(String urlPage) {
         if (urlPage.isEmpty()) {
             return "";
