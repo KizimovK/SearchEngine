@@ -1,8 +1,7 @@
-package searchengine.companets;
+package searchengine.utils;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
@@ -29,11 +28,11 @@ public class MakerIndex {
     }
 
 
-    public void taskCreateIndexLemmas(PageDto pageDto, ConcurrentHashMap<String, Integer> lemmasMapOnSite) {
+    public void taskCreateIndexLemmas(PageDto pageDto,SiteDto siteDto, ConcurrentHashMap<String, Integer> lemmasMapOnSite) {
         if (pageDto.getContent().isBlank()) {
             return;
         }
-        SiteEntity siteEntity = siteMapper.toSiteEntity(pageDto.getSiteDto());
+        SiteEntity siteEntity = siteMapper.toSiteEntity(siteDto);
         Map<String, Integer> lemmasRankOnPage = extractLemma.getMapLemmasOnPage(pageDto);
         for (String lemma : lemmasRankOnPage.keySet()) {
             int idLemma;

@@ -9,10 +9,6 @@ import java.util.List;
 
 public interface PageService {
 
-    PageDto savePage(PageDto pageDto) throws IOException;
-
-    List<PageDto> allSavePage(List<PageDto> pageDtoList);
-
-    void dropPagesSite(SiteDto siteDto);
+    PageDto savePage(PageDto pageDto, SiteDto siteDto);
 
 }

@@ -2,7 +2,7 @@ package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import searchengine.companets.ExtractLemma;
+import searchengine.utils.ExtractLemma;
 import searchengine.dto.data.SiteDto;
 import searchengine.mapping.SiteMapper;
 import searchengine.model.LemmaEntity;

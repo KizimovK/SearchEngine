@@ -1,4 +1,4 @@
-package searchengine.companets;
+package searchengine.utils;
 
 import org.apache.lucene.morphology.LuceneMorphology;
 import org.jsoup.Jsoup;

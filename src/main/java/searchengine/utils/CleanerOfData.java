@@ -1,4 +1,4 @@
-package searchengine.companets;
+package searchengine.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class CleanerOfDataSite {
+public class CleanerOfData {
     private final SiteRepository siteRepository;
     private final SiteMapper siteMapper;
     private final PageRepository pageRepository;
@@ -25,7 +25,9 @@ public class CleanerOfDataSite {
     private final IndexRepository indexRepository;
 
 
-    public CleanerOfDataSite(SiteRepository siteRepository, SiteMapper siteMapper, PageRepository pageRepository, LemmaRepository lemmaRepository, IndexRepository indexRepository) {
+    public CleanerOfData(SiteRepository siteRepository, SiteMapper siteMapper,
+                         PageRepository pageRepository, LemmaRepository lemmaRepository,
+                         IndexRepository indexRepository) {
         this.siteRepository = siteRepository;
         this.siteMapper = siteMapper;
         this.pageRepository = pageRepository;
@@ -33,7 +35,7 @@ public class CleanerOfDataSite {
         this.indexRepository = indexRepository;
     }
 
-    public void cleaning(SiteDto siteDto) {
+    public void removeSite(SiteDto siteDto) {
         log.info("Begin remove on site " + siteDto.getUrl());
         SiteEntity site = siteRepository.findByUrl(siteDto.getUrl());
         if (site == null) {

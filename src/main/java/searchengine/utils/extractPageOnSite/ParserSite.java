@@ -1,8 +1,8 @@
-package searchengine.companets.extractPageOnSite;
+package searchengine.utils.extractPageOnSite;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import searchengine.companets.MakerIndex;
+import searchengine.utils.MakerIndex;
 import searchengine.config.ConfigOptions;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;

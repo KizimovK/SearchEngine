@@ -1,11 +1,12 @@
 package searchengine.mapping;
 
+import org.mapstruct.Mapper;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.SiteEntity;
 
 import java.util.List;
 
-//@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring")
 public interface SiteMapper {
 
 

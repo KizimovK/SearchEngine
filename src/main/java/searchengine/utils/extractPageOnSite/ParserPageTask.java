@@ -1,4 +1,4 @@
-package searchengine.companets.extractPageOnSite;
+package searchengine.utils.extractPageOnSite;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
@@ -6,13 +6,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import searchengine.companets.MakerIndex;
 import searchengine.config.ConfigOptions;
 import searchengine.dto.data.PageDto;
 import searchengine.dto.data.SiteDto;
 import searchengine.model.StatusIndexing;
 import searchengine.services.PageService;
 import searchengine.services.SiteService;
+import searchengine.utils.MakerIndex;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -32,15 +32,13 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
 
     private static volatile boolean canceled = false;
     private final String urlSite;
-    private SiteDto siteDto;
     private final CopyOnWriteArraySet<String> allPagesSite;
-
     private final ConfigOptions configOptions;
     private final PageService pageService;
-
     private final SiteService siteService;
     private final MakerIndex makerIndex;
     private final ConcurrentHashMap<String, Integer> lemmasMapOnSite;
+    private SiteDto siteDto;
 
     public ParserPageTask(String urlSite, SiteDto siteDto,
                           CopyOnWriteArraySet<String> allPagesSite, ConfigOptions configOptions,
@@ -80,7 +78,7 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
 
     @Override
     protected CopyOnWriteArraySet<String> compute() {
-        Document document = null;
+        Document document;
         List<ParserPageTask> taskList = new CopyOnWriteArrayList<>();
         try {
             sleep(150);
@@ -99,16 +97,13 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
                         !urlPage.contains("#")) {
                     allPagesSite.add(urlPage);
                     log.info("PARSING PAGE " + urlPage);
-                    PageDto pageDto = pageService.savePage(getPageDtoUrl(urlPage, siteDto));
-                    makerIndex.taskCreateIndexLemmas(pageDto, lemmasMapOnSite);
+                    createLemmasIndexesSavingPage(urlPage, siteDto, lemmasMapOnSite);
                     task = new ParserPageTask(urlPage, siteDto, allPagesSite,
                             configOptions, pageService, siteService, makerIndex, lemmasMapOnSite);
                     task.fork();
                     taskList.add(task);
                 }
             }
-        } catch (HttpStatusException e) {
-            getPageDtoHttpStatusException(e);
         } catch (Exception e) {
             handleException(e);
         } finally {
@@ -119,8 +114,16 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
         return allPagesSite;
     }
 
+    private void createLemmasIndexesSavingPage(String urlPage, SiteDto siteDto,
+                                               ConcurrentHashMap<String, Integer> lemmasMapOnSite) throws IOException {
+        PageDto pageDto = pageService.savePage(getPageDtoUrl(urlPage),siteDto);
+        makerIndex.taskCreateIndexLemmas(pageDto, siteDto, lemmasMapOnSite);
+    }
+
     private void handleException(Exception e) {
-        if (e instanceof UnknownHostException) {
+        if (e instanceof HttpStatusException) {
+            pageService.savePage(getPageDtoHttpStatusException((HttpStatusException) e), siteDto);
+        } else if (e instanceof UnknownHostException) {
             setException("Unknown host exception or not connecting url " + e.getMessage());
         } else if (e instanceof SocketTimeoutException) {
             setException("Read timed out or not connecting.");
@@ -130,18 +133,15 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
             setException(e.getMessage());
         }
     }
-    private void setSiteDto(SiteDto siteDto)
-    {
+
+    private void setSiteDto(SiteDto siteDto) {
         this.siteDto = siteDto;
     }
+
     public void parserPageOneTask(String urlPage, SiteDto siteDto) {
         setSiteDto(siteDto);
         try {
-            ConcurrentHashMap<String, Integer> lemmasMap = makerIndex.getMapLemmas(siteDto);
-            PageDto pageDto = pageService.savePage(getPageDtoUrl(urlPage, siteDto));
-            makerIndex.taskCreateIndexLemmas(pageDto, lemmasMap);
-        } catch (HttpStatusException e) {
-            getPageDtoHttpStatusException(e);
+            createLemmasIndexesSavingPage(urlPage, siteDto, makerIndex.getMapLemmas(siteDto));
         } catch (Exception e) {
             handleException(e);
         }
@@ -152,13 +152,12 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
                 .referrer(configOptions.getReferrer()).get();
     }
 
-    private PageDto getPageDtoUrl(String urlPage, SiteDto siteDto) throws IOException {
+    private PageDto getPageDtoUrl(String urlPage) throws IOException {
         Document document = getDocumentUrlPage(urlPage);
         int code = document.connection().response().statusCode();
         String content = document.outerHtml();
         PageDto pageDto = new PageDto();
         pageDto.setPath(getPathPage(urlPage));
-        pageDto.setSiteDto(siteDto);
         pageDto.setCode(code);
         pageDto.setContent(content);
         return pageDto;
@@ -171,7 +170,6 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
         PageDto pageDto = new PageDto();
         getPathPage(urlPage);
         pageDto.setPath(getPathPage(urlPage));
-        pageDto.setSiteDto(siteDto);
         pageDto.setCode(code);
         pageDto.setContent(null);
         log.error(lastError);
@@ -200,13 +198,12 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
         if (urlPage.isEmpty()) {
             return "";
         }
-        URL url = null;
+        URL url;
         try {
             url = new URL(urlPage);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-
         return url.getPath();
     }
 

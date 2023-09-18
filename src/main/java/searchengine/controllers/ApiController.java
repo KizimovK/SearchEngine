@@ -60,22 +60,20 @@ public class ApiController {
 
     @PostMapping("/indexPage")
     public ResponseEntity<Response> indexOnePage(@RequestParam(name = "url") String urlPage) {
-        Response response;
         if (urlPage.isEmpty()) {
-            response = new Response(false, "Страница не указана");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Response(false, "Страница не указана"),HttpStatus.BAD_REQUEST);
         }
-        if (!pageIndexService.isValidUrl(urlPage)){
-            response = new Response(false, "Неверный формат адресса запрашиваемой страницы");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        if (!pageIndexService.isValidUrl(urlPage)) {
+            return new ResponseEntity<>(
+                    new Response(false, "Неверный формат адресса запрашиваемой страницы"),
+                    HttpStatus.BAD_REQUEST);
         }
         if (!pageIndexService.isPresentUrlPage(urlPage)) {
-            response = new Response(false, "Указанная страница за пределами конфигурационного файла");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Response(false,
+                    "Указанная страница за пределами конфигурационного файла"),HttpStatus.BAD_REQUEST);
         } else {
             pageIndexService.indexOnePage(urlPage);
-            response = new Response(true, "");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(new Response(true, ""),HttpStatus.OK);
         }
     }
 

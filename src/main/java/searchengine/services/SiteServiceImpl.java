@@ -4,17 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import searchengine.config.ConfigOptions;
 import searchengine.config.SiteConfig;
 import searchengine.dto.data.SiteDto;
 import searchengine.mapping.SiteMapper;
-import searchengine.model.SiteEntity;
 import searchengine.model.StatusIndexing;
 import searchengine.repository.SiteRepository;
 
 import javax.persistence.EntityManagerFactory;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +38,6 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public void allSaveSites(List<SiteDto> siteDtoList) {
-        siteRepository.flush();
-        siteRepository.saveAll(siteMapper.toSiteEntityList(siteDtoList));
-    }
-
-    @Override
     public SiteDto saveSite(SiteDto siteDto) {
         return siteMapper.toSiteDto(siteRepository.saveAndFlush(siteMapper.toSiteEntity(siteDto)));
     }
@@ -51,9 +45,7 @@ public class SiteServiceImpl implements SiteService {
     @Override
     public List<SiteDto> findAllSite() {
         siteRepository.flush();
-        List<SiteDto> siteDtoList = new ArrayList<>();
-        siteDtoList.addAll(siteMapper.toSiteDtoList((List<SiteEntity>) siteRepository.findAll()));
-        return siteDtoList;
+        return new ArrayList<>(siteMapper.toSiteDtoList(siteRepository.findAll()));
     }
 
     @Override
@@ -96,8 +88,32 @@ public class SiteServiceImpl implements SiteService {
     }
 
     private Session getSession() {
-        Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
-        return session;
+        return entityManagerFactory.unwrap(SessionFactory.class).openSession();
+    }
+
+    @Override
+    public String getBaseUrlSite(String urlPage) {
+        if (urlPage.isEmpty()) {
+            return "";
+        }
+        URL url;
+        try {
+            url = new URL(urlPage);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return url.getHost();
+    }
+
+    @Override
+    public SiteDto getSiteFromConfig(SiteConfig siteConfig) {
+        SiteDto siteDTO = new SiteDto();
+        siteDTO.setUrl(siteConfig.getUrl());
+        siteDTO.setName(siteConfig.getName());
+        siteDTO.setStatus(StatusIndexing.INDEXING);
+        siteDTO.setStatusTime(LocalDateTime.now());
+        siteDTO.setLastError(null);
+        return siteDTO;
     }
 
 }
