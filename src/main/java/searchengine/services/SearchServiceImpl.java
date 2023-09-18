@@ -168,8 +168,7 @@ public class SearchServiceImpl implements SearchService {
 //        return result.toString();
 //    }
 
-    //Получение позиций ближайших лемм в контенте
-    private Map<String, Integer> getPositionsMap(String bodyContent, List<String> lemmasQueryList) {
+        private Map<String, Integer> getPositionsMap(String bodyContent, List<String> lemmasQueryList) {
         Map<Integer, String> allLemmasAllPositionsMap = new TreeMap<>();
         for (String lemma : lemmasQueryList) {
             List<Integer> indexLemmaInContent = getIndexLemmaInContent(bodyContent, lemma);
@@ -192,7 +191,6 @@ public class SearchServiceImpl implements SearchService {
         return positionsMap;
     }
 
-    //   Получение всех позиций, одной леммы в контенте
     private List<Integer> getIndexLemmaInContent(String bodyContent, String lemma) {
         TreeSet<Integer> indexLemmaInText = new TreeSet<>();
         bodyContent = bodyContent.toLowerCase(Locale.ROOT);
