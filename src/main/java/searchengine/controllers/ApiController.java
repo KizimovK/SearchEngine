@@ -61,7 +61,7 @@ public class ApiController {
     @PostMapping("/indexPage")
     public ResponseEntity<Response> indexOnePage(@RequestParam(name = "url") String urlPage) {
         if (urlPage.isEmpty()) {
-            return new ResponseEntity<>(new Response(false, "Страница не указана"),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Response(false, "Страница не указана"), HttpStatus.BAD_REQUEST);
         }
         if (!pageIndexService.isValidUrl(urlPage)) {
             return new ResponseEntity<>(
@@ -70,10 +70,10 @@ public class ApiController {
         }
         if (!pageIndexService.isPresentUrlPage(urlPage)) {
             return new ResponseEntity<>(new Response(false,
-                    "Указанная страница за пределами конфигурационного файла"),HttpStatus.BAD_REQUEST);
+                    "Указанная страница за пределами конфигурационного файла"), HttpStatus.BAD_REQUEST);
         } else {
             pageIndexService.indexOnePage(urlPage);
-            return new ResponseEntity<>(new Response(true, ""),HttpStatus.OK);
+            return new ResponseEntity<>(new Response(true, ""), HttpStatus.OK);
         }
     }
 
@@ -88,8 +88,8 @@ public class ApiController {
                                     @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
                                     @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
         if (query.isEmpty()) {
-            Response response = new Response(false, "Задан пустой поисковой запрос");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Response(false, "Задан пустой поисковой запрос"),
+                    HttpStatus.BAD_REQUEST);
         }
         SearchResponse searchResponse;
         if (site.isEmpty()) {
@@ -98,8 +98,7 @@ public class ApiController {
             searchResponse = searchService.getResponseSearch(query, site, offset, limit);
         }
         if (!searchResponse.isResult()) {
-            Response response = new Response(false, "Не найдено");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(new Response(false, "Не найдено"), HttpStatus.OK);
         }
         return new ResponseEntity<>(searchResponse, HttpStatus.OK);
     }
