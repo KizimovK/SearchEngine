@@ -112,7 +112,7 @@ public class SiteServiceImpl implements SiteService {
         siteDTO.setName(siteConfig.getName());
         siteDTO.setStatus(StatusIndexing.INDEXING);
         siteDTO.setStatusTime(LocalDateTime.now());
-        siteDTO.setLastError(null);
+        siteDTO.setLastError("");
         return siteDTO;
     }
 

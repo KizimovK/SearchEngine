@@ -114,14 +114,14 @@ public class SearchServiceImpl implements SearchService {
         while (!countLemmasInPageMap.isEmpty()) {
             int maxCountLemma = Collections.max(countLemmasInPageMap.values());
             List<PageEntity> pageListInMaxCount = countLemmasInPageMap.keySet().stream().
-                    filter(p -> countLemmasInPageMap.get(p) == maxCountLemma).collect(Collectors.toList());
+                    filter(p -> countLemmasInPageMap.get(p) == maxCountLemma).toList();
             Map<PageEntity, Float> pageRelevanceTempMap = pageListInMaxCount.stream().map(page ->
                             new AbstractMap.SimpleEntry<>(page, pageRelevanceAbsMap.get(page) / maxRelevancePage)).
                     sorted((p1, p2) -> p2.getValue().compareTo(p1.getValue())).
                     collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                             (f1, f2) -> f1, LinkedHashMap::new));
             pageRelevanceMap.putAll(pageRelevanceTempMap);
-            countLemmasInPageMap.keySet().removeAll(pageListInMaxCount);
+            pageListInMaxCount.forEach(countLemmasInPageMap.keySet()::remove);
         }
         return pageRelevanceMap;
     }
@@ -134,16 +134,15 @@ public class SearchServiceImpl implements SearchService {
         StringBuilder resultSnippet = new StringBuilder();
         int lastEndPosition = 0;
         for (int position : positionsSet) {
-            int beginPosition = bodyContent.indexOf(" ", position - 75 < 0 ? 0 : position - 75);
-            int endPosition = bodyContent.lastIndexOf(" ", position + 75 > bodyContent.length() ?
-                    bodyContent.length() : position + 75);
+            int beginPosition = bodyContent.indexOf(" ", Math.max(position - 75, 0));
+            int endPosition = bodyContent.lastIndexOf(" ", Math.min(position + 75, bodyContent.length()));
             if (beginPosition - lastEndPosition > 150 && lastEndPosition != 0) {
                 resultSnippet.append("...");
             }
             if (beginPosition < lastEndPosition && lastEndPosition != 0) {
-                resultSnippet.append(bodyContent.substring(lastEndPosition, endPosition));
+                resultSnippet.append(bodyContent, lastEndPosition, endPosition);
             } else {
-                resultSnippet.append(bodyContent.substring(beginPosition, endPosition));
+                resultSnippet.append(bodyContent, beginPosition, endPosition);
             }
             lastEndPosition = endPosition;
             wordBoltList.add(bodyContent.substring(position, bodyContent.indexOf(" ", position)));
@@ -158,15 +157,7 @@ public class SearchServiceImpl implements SearchService {
         return text;
     }
 
-//    private String joinTwoString(String one, String two) {
-//        Set<String> resultSet = new LinkedHashSet<>(List.of(one.split("\\s+")));
-//        resultSet.addAll(List.of(two.split("\\s+")));
-//        StringBuilder result = new StringBuilder();
-//        for (String s : resultSet) {
-//            result.append(s).append(" ");
-//        }
-//        return result.toString();
-//    }
+
 
         private Map<String, Integer> getPositionsMap(String bodyContent, List<String> lemmasQueryList) {
         Map<Integer, String> allLemmasAllPositionsMap = new TreeMap<>();

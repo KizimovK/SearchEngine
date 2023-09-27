@@ -81,7 +81,7 @@ public class ParserPageTask extends RecursiveTask<CopyOnWriteArraySet> {
         Document document;
         List<ParserPageTask> taskList = new CopyOnWriteArrayList<>();
         try {
-            sleep(150);
+            sleep(300);
             document = getDocumentUrlPage(urlSite);
             String urlPage;
             Elements elements = document.select("a[href]");
