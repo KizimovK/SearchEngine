@@ -44,11 +44,11 @@
 4. В командной оболочке(терминале ) перейти в корневую папку проекта и 
 выполнить команду для компиляции:
 ```shell
-   mvn —U clear package
+   mvn —U clean package
    ```
    Результат компиляции,_SearchEngine-1.0-SNAPSHOT.jar_, будет располагаться в папке target. Этот файл можно перенести 
    в любую   доступную папку на компьютере, при этом в той же папке должны находиться файл конфигурации _application.yaml_.
 5. Приложение запускается строкой:
 ```shell
-   java -jar SearchEngine-0.0.1-SNAPSHOT.jar.
+   java -jar SearchEngine-0.0.1-SNAPSHOT.jar
 ```
